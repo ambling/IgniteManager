@@ -10,6 +10,7 @@ import org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder;
 import org.apache.ignite.spi.discovery.tcp.ipfinder.vm.TcpDiscoveryVmIpFinder;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +28,7 @@ public class AdminNode {
 
         // Create new configuration.
         IgniteConfiguration cfg = new IgniteConfiguration();
+        cfg.setGridName(clusterName);
         Ignition.setClientMode(true);
         Ignition.setDaemon(true);
 
@@ -66,14 +68,20 @@ public class AdminNode {
         }
     }
 
+    void start(File config) {
+        cluster.startNodes(config, false, 10, 10);
+    }
+
     public final static String USAGE = "AdminNode [gridname] [command] <args..>\n" +
             "   list              - list available server node by ID\n" +
             "   info <ID>         - print metrics of a server node by ID\n" +
+            "   start <config>    - start servers according to the config file\n" +
             "   stop              - kill all server\n" +
             "   stop <list of ID> - kill list of servers";
 
     public final static String COMMAND_LIST = "list";
     public final static String COMMAND_INFO = "info";
+    public final static String COMMAND_START = "start";
     public final static String COMMAND_STOP = "stop";
 
     public static void main( String[] args )
@@ -88,12 +96,23 @@ public class AdminNode {
 
         System.out.println(gridName);
 
-        Collection<String> hosts = new ArrayList<String>();
-        hosts.add("localhost");
+        String[] hostsArray = {"gaoDB1", "gaoDB2", "gaoDB3", "gaoDB4",
+                               "gaoDB5", "gaoDB6", "gaoDB7", "gaoDB8", "gaoDB9"};
+        Collection<String> hosts = Arrays.asList(hostsArray);
         AdminNode admin = new AdminNode(gridName, hosts);
         if (COMMAND_LIST.equals(command)) {
             Collection<UUID> ids = admin.list();
             for (UUID id: ids) System.out.println(id);
+
+        } else if (COMMAND_START.equals(command)) {
+            if (args.length < 3) {
+                System.out.println(USAGE);
+                return;
+            }
+
+            String config = args[2];
+            File configFile = new File(config);
+            admin.start(configFile);
 
         } else if (COMMAND_INFO.equals(command)) {
             if (args.length < 3) {
