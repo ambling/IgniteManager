@@ -96,7 +96,7 @@ public class AdminNode {
 
         System.out.println(gridName);
 
-        String[] hostsArray = {"gaoDB1", "gaoDB2", "gaoDB3", "gaoDB4",
+        String[] hostsArray = {"gaoDB0", "gaoDB1", "gaoDB2", "gaoDB3", "gaoDB4",
                                "gaoDB5", "gaoDB6", "gaoDB7", "gaoDB8", "gaoDB9"};
         Collection<String> hosts = Arrays.asList(hostsArray);
         AdminNode admin = new AdminNode(gridName, hosts);
